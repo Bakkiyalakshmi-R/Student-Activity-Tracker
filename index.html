@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Student Activity Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="full-hero">
+    <div class="hero-center">
+      <h1 class="hero-title">Student Activity Tracker</h1>
+      <p class="hero-sub typewriter">Filters, edit, delete, reorder, undo, and accessibility improvements.</p>
+      <div class="hero-cta">
+        <button id="get-started" class="primary">Get Started</button>
+      </div>
+    </div>
+    <div class="bg-blobs" aria-hidden="true">
+      <span class="blob b1"></span>
+      <span class="blob b2"></span>
+      <span class="blob b3"></span>
+    </div>
+  </div>
+
+  <!-- Pages wrapper (hidden initially) -->
+  <div class="pages-wrapper" id="pages-wrapper" style="display:none">
+    <header class="top">
+      <div>
+        <h1>Student Activity Tracker <span class="badge" id="total-badge">0</span></h1>
+        <p class="muted">Filters, edit, delete, reorder, undo, and accessibility improvements.</p>
+      </div>
+      <nav aria-label="primary actions" class="actions">
+        <button id="btn-all" class="chip active" aria-pressed="true">All</button>
+        <button id="btn-pending" class="chip" aria-pressed="false">Pending</button>
+        <button id="btn-completed" class="chip" aria-pressed="false">Completed</button>
+      </nav>
+      <div class="sort-wrap">
+        <label for="sort-select" class="sr-only">Sort activities</label>
+        <select id="sort-select" aria-label="Sort activities">
+          <option value="custom">Custom (manual)</option>
+          <option value="name">Name</option>
+          <option value="due">Due date</option>
+          <option value="priority">Priority</option>
+        </select>
+      </div>
+    </header>
+
+    <section id="home-page" class="page">
+      <!-- keep a small hero inside app for consistency -->
+      <section id="home-hero" class="home-hero">
+        <div class="hero-card">
+          <div>
+            <h2>Welcome back</h2>
+            <p class="hero-sub">Track your learning journey — interactive, animated, and accessible.</p>
+            <div class="hero-stats">
+              <div><strong id="hero-completed">0</strong><small>completed</small></div>
+              <div><strong id="hero-total">0</strong><small>total</small></div>
+              <div><strong id="hero-percent">0%</strong><small>progress</small></div>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <button id="view-activities-btn" class="primary">View Activities</button>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section id="activities-page" class="page">
+      <main>
+        <section class="controls">
+          <form id="add-form" aria-label="Add new activity">
+            <input id="new-name" placeholder="Activity name" aria-label="Activity name" required>
+            <input id="new-desc" placeholder="Short description" aria-label="Activity description">
+            <select id="new-priority" aria-label="Priority">
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Low">Low</option>
+            </select>
+            <select id="new-category" aria-label="Category">
+              <option value="General">General</option>
+              <option value="Study">Study</option>
+              <option value="Practice">Practice</option>
+              <option value="Project">Project</option>
+            </select>
+            <input id="new-due" type="date" aria-label="Due date">
+            <button type="submit" class="primary">Add</button>
+          </form>
+
+          <div class="search-area">
+            <input id="search" placeholder="Search activities..." aria-label="Search activities">
+            <button id="clear-completed" class="secondary">Clear completed</button>
+          </div>
+        </section>
+
+        <!-- Bulk actions toolbar -->
+        <div id="bulk-toolbar" class="bulk-toolbar" style="display:none">
+          <label><input type="checkbox" id="select-all"> Select all</label>
+          <div class="bulk-actions">
+            <button id="bulk-complete" class="secondary">Mark completed</button>
+            <button id="bulk-delete" class="secondary">Delete</button>
+            <label for="bulk-assign">Assign category</label>
+            <select id="bulk-assign">
+              <option value="">Choose</option>
+              <option>General</option>
+              <option>Study</option>
+              <option>Practice</option>
+              <option>Project</option>
+            </select>
+          </div>
+          <span id="bulk-count" class="bulk-count">0 selected</span>
+        </div>
+
+        <section class="progress" aria-live="polite">
+          <div class="progress-info">
+            <strong id="progress-text">0 of 0</strong>
+            <small id="progress-percent">0%</small>
+          </div>
+          <div class="progress-bar" aria-hidden="true">
+            <div id="progress-fill" class="progress-fill" style="width:0%"></div>
+          </div>
+        </section>
+
+        <ul id="activity-list" class="activity-list" aria-label="Activity list">
+          <!-- Items injected here -->
+        </ul>
+      </main>
+    </section>
+
+    <div id="toast" class="toast" role="status" aria-live="assertive" aria-atomic="true">
+      <span id="toast-msg">Saved</span>
+      <button id="toast-undo" class="undo">Undo</button>
+    </div>
+
+    <template id="item-template">
+      <li class="activity" draggable="true">
+        <div class="select-wrap">
+          <input type="checkbox" class="select-checkbox" aria-label="Select activity">
+        </div>
+        <div class="left">
+          <button class="toggle" aria-label="Toggle completion">
+            <!-- check icon -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="middle">
+          <div class="title"></div>
+          <div class="desc"></div>
+          <div class="meta"><span class="category"></span> <span class="due"></span></div>
+        </div>
+        <div class="right">
+          <button class="edit" aria-label="Edit activity">Edit</button>
+          <button class="delete" aria-label="Delete activity">Delete</button>
+        </div>
+      </li>
+    </template>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
